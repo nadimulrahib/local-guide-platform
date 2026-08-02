@@ -11,3 +11,115 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+enum Role {
+  ADMIN
+  GUIDE
+  TOURIST
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  name               String
+  email              String   @unique
+  password           String
+
+  role               Role     @default(TOURIST)
+
+  profileImage       String?
+  bio                String?
+
+  languages          String[]
+
+  expertise          String?
+  dailyRate          Float?
+
+  travelPreference   String?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  listings           Listing[]
+  touristBookings    Booking[] @relation("TouristBookings")
+  guideBookings      Booking[] @relation("GuideBookings")
+  reviews            Review[]
+}
+
+model Listing {
+
+  id             String @id @default(cuid())
+
+  title          String
+
+  description    String
+
+  itinerary      String
+
+  city           String
+
+  category       String
+
+  meetingPoint   String
+
+  duration       Int
+
+  maxGroupSize   Int
+
+  price          Float
+
+  images         String[]
+
+  isActive       Boolean @default(true)
+
+  guideId        String
+
+  guide          User @relation(fields: [guideId], references: [id])
+
+  bookings       Booking[]
+
+  reviews        Review[]
+
+  createdAt      DateTime @default(now())
+
+  updatedAt      DateTime @updatedAt
+}
+
+model Booking {
+  id             String @id @default(cuid())
+  status         BookingStatus @default(PENDING)
+  touristId      String
+  tourist        User @relation("TouristBookings", fields: [touristId], references: [id])
+  guideId        String
+  guide          User @relation("GuideBookings", fields: [guideId], references: [id])
+  listingId      String
+  listing        Listing @relation(fields: [listingId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Review {
+  id             String @id @default(cuid())
+  rating         Int
+  comment        String?
+  userId         String
+  user           User @relation(fields: [userId], references: [id])
+  listingId      String
+  listing        Listing @relation(fields: [listingId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
