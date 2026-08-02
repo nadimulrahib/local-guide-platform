@@ -57,69 +57,120 @@ model User {
   listings           Listing[]
   touristBookings    Booking[] @relation("TouristBookings")
   guideBookings      Booking[] @relation("GuideBookings")
-  reviews            Review[]
+  touristReviews     Review[] @relation("TouristReviews")
+  guideReviews       Review[] @relation("GuideReviews")
 }
 
 model Listing {
 
-  id             String @id @default(cuid())
+  id              String @id @default(cuid())
 
-  title          String
+  title           String
 
-  description    String
+  description     String
 
-  itinerary      String
+  itinerary       String
 
-  city           String
+  city            String
 
-  category       String
+  category        String
 
-  meetingPoint   String
+  meetingPoint    String
 
-  duration       Int
+  duration        Int
 
-  maxGroupSize   Int
+  maxGroupSize    Int
 
-  price          Float
+  price           Float
 
-  images         String[]
+  images          String[]
 
-  isActive       Boolean @default(true)
+  isActive        Boolean @default(true)
 
-  guideId        String
+  guideId         String
 
-  guide          User @relation(fields: [guideId], references: [id])
+  guide           User @relation(fields: [guideId], references: [id], onDelete: Cascade)
 
-  bookings       Booking[]
+  bookings        Booking[]
 
-  reviews        Review[]
+  reviews         Review[]
 
-  createdAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
 
-  updatedAt      DateTime @updatedAt
+  updatedAt       DateTime @updatedAt
 }
 
 model Booking {
+
   id             String @id @default(cuid())
-  status         BookingStatus @default(PENDING)
+
   touristId      String
-  tourist        User @relation("TouristBookings", fields: [touristId], references: [id])
+
   guideId        String
-  guide          User @relation("GuideBookings", fields: [guideId], references: [id])
+
   listingId      String
+
+  bookingDate    DateTime
+
+  totalAmount    Float
+
+  status         BookingStatus @default(PENDING)
+
+  paymentStatus  PaymentStatus @default(PENDING)
+
+  tourist        User @relation("TouristBookings", fields: [touristId], references: [id])
+
+  guide          User @relation("GuideBookings", fields: [guideId], references: [id])
+
   listing        Listing @relation(fields: [listingId], references: [id])
+
+  payment        Payment?
+
   createdAt      DateTime @default(now())
+
   updatedAt      DateTime @updatedAt
 }
 
 model Review {
-  id             String @id @default(cuid())
-  rating         Int
-  comment        String?
-  userId         String
-  user           User @relation(fields: [userId], references: [id])
-  listingId      String
-  listing        Listing @relation(fields: [listingId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  id            String @id @default(cuid())
+
+  rating        Int
+
+  comment       String
+
+  touristId     String
+
+  guideId       String
+
+  listingId     String
+
+  tourist       User @relation("TouristReviews", fields: [touristId], references: [id])
+
+  listing       Listing @relation(fields: [listingId], references: [id])
+
+  guide         User @relation("GuideReviews", fields: [guideId], references: [id])
+
+  createdAt     DateTime @default(now())
+
+  updatedAt     DateTime @updatedAt
+}
+
+model Payment {
+
+  id              String @id @default(cuid())
+
+  bookingId       String @unique
+
+  amount          Float
+
+  transactionId   String @unique
+
+  status          PaymentStatus
+
+  paymentMethod   String
+
+  booking         Booking @relation(fields: [bookingId], references: [id])
+
+  createdAt       DateTime @default(now())
 }
