@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../../generated/prisma/client"
 }
 
 datasource db {
@@ -35,69 +35,94 @@ enum PaymentStatus {
 
 model User {
   id                 String   @id @default(cuid())
+
   name               String
   email              String   @unique
   password           String
 
   role               Role     @default(TOURIST)
 
+  phone              String?
   profileImage       String?
   bio                String?
 
   languages          String[]
 
-  expertise          String?
-  dailyRate          Float?
+  expertise          String[]
+
+  dailyRate          Decimal? @db.Decimal(10,2)
 
   travelPreference   String?
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  averageRating      Float     @default(0)
+  totalReviews       Int       @default(0)
+
+  isActive           Boolean   @default(true)
+  isVerified         Boolean   @default(false)
+  isDeleted          Boolean   @default(false)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   listings           Listing[]
+
   touristBookings    Booking[] @relation("TouristBookings")
   guideBookings      Booking[] @relation("GuideBookings")
+
   touristReviews     Review[] @relation("TouristReviews")
   guideReviews       Review[] @relation("GuideReviews")
+
+  @@index([email])
+  @@index([role])
 }
 
 model Listing {
 
-  id              String @id @default(cuid())
+  id             String @id @default(cuid())
 
-  title           String
+  title          String
 
-  description     String
+  slug           String @unique
 
-  itinerary       String
+  description    String
 
-  city            String
+  itinerary      String
 
-  category        String
+  city           String
 
-  meetingPoint    String
+  category       String
 
-  duration        Int
+  meetingPoint   String
 
-  maxGroupSize    Int
+  duration       Int
 
-  price           Float
+  maxGroupSize   Int
 
-  images          String[]
+  price          Decimal @db.Decimal(10,2)
 
-  isActive        Boolean @default(true)
+  images         String[]
 
-  guideId         String
+  isActive       Boolean @default(true)
 
-  guide           User @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  guideId        String
 
-  bookings        Booking[]
+  guide          User @relation(fields: [guideId], references: [id], onDelete: Cascade)
 
-  reviews         Review[]
+  bookings       Booking[]
 
-  createdAt       DateTime @default(now())
+  reviews        Review[]
 
-  updatedAt       DateTime @updatedAt
+  createdAt      DateTime @default(now())
+
+  updatedAt      DateTime @updatedAt
+
+  @@index([city])
+
+  @@index([category])
+
+  @@index([price])
+
+  @@index([guideId])
 }
 
 model Booking {
@@ -123,6 +148,7 @@ model Booking {
   guide          User @relation("GuideBookings", fields: [guideId], references: [id])
 
   listing        Listing @relation(fields: [listingId], references: [id])
+  numberOfGuests Int @default(1)
 
   payment        Payment?
 
@@ -144,6 +170,7 @@ model Review {
   guideId       String
 
   listingId     String
+  @@unique([touristId, listingId])
 
   tourist       User @relation("TouristReviews", fields: [touristId], references: [id])
 
