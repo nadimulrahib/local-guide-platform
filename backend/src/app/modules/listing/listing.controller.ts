@@ -28,6 +28,19 @@ const imageUrls = files.map(file => file.path);
   });
 });
 
+const getListing = catchAsync(async (req: any, res: any) => {
+  const result = await ListingService.getListing(); 
+
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Listings retrieved successfully",
+    data: result,
+  });
+});
+
 export const ListingController = {
   createListing,
+  getListing,
 };

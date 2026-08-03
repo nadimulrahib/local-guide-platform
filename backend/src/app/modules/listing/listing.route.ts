@@ -19,4 +19,9 @@ router.post(
   ListingController.createListing
 );
 
+router.get(
+  "/",
+  ListingController.getListing
+);
+
 export const ListingRoutes = router;
