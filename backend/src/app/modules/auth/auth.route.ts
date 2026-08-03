@@ -6,6 +6,7 @@ import {
   loginValidation,
   registerValidation,
 } from "./auth.validation";
+import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
@@ -20,5 +21,7 @@ router.post(
   validateRequest(loginValidation),
   AuthController.login
 );
+
+router.get("/me",auth("ADMIN","GUIDE","TOURIST"), AuthController.getMyProfile);
 
 export const AuthRoutes = router;

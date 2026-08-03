@@ -70,7 +70,30 @@ const loginUser = async (payload: any) => {
   };
 };
 
+
+const getMyProfile = async (id: string) => {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      profileImage: true,
+      bio: true,
+      languages: true,
+      expertise: true,
+      dailyRate: true,
+    },
+  });
+};
+
+
 export const AuthService = {
   registerUser,
   loginUser,
+    getMyProfile,
+
 };
