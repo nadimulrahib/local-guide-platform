@@ -23,17 +23,17 @@ router.get(
   "/",
   ListingController.getListing
 );
+router.get(
+  "/my-listings",
+  auth("GUIDE"),
+  ListingController.getMyListings
+);
 
 router.get(
   "/:id",
   ListingController.getListingById
 );
 
-router.get(
-  "/my-listings",
-  auth("GUIDE"),
-  ListingController.getMyListings
-);
 
 router.patch(
   "/:id",

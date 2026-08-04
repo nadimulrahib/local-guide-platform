@@ -38,7 +38,7 @@ const getListing = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Listings retrieved successfully",
+    message: "Get all Listings retrieved successfully",
     data: result,
   });
 });
@@ -50,13 +50,13 @@ const getListingById = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Listing retrieved successfully",
+    message: "Get Single Listing retrieved successfully",
     data: result,
   });
 });
 
 const getMyListings = catchAsync(async (req: Request, res: Response) => {
-  const result = await ListingService.getMyListings(req.user.userId);
+  const result = await ListingService.getMyListings(req.user.guideId);
 
   sendResponse(res, {
     success: true,

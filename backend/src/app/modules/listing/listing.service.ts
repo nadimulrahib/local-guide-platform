@@ -109,9 +109,10 @@ const getListingById = async (id: string) => {
   });
 }
 
-const getMyListings = async (userId: string) => {
+const getMyListings = async (guideId: string) => {
+  // console.log(guideId,'guideId')
   return prisma.listing.findMany({
-    where: { guideId: userId },
+    where: { guideId:guideId },
   });
 };
 
