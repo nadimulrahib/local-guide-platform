@@ -2,6 +2,7 @@ import { is } from "zod/locales";
 import { prisma } from "../../config/prisma";
 import AppError from "../../errors/AppError";
 import { IListing } from "./listing.interface";
+import { QueryBuilder } from "../../builder/QueryBuilder";
 
 const createListing = async (userId: string, payload: IListing) => {
   return prisma.listing.create({
@@ -13,59 +14,21 @@ const createListing = async (userId: string, payload: IListing) => {
 };
 
 const getListing = async (query: Record<string, any>) => {
-  const {
-    searchTerm,
-    city,
-    category,
-    minPrice,
-    maxPrice,
-    page = "1",
-    limit = "10",
-    sortBy = "createdAt",
-    sortOrder = "desc",
-  } = query;
+  const queryBuilder = new QueryBuilder(query)
+    .search(["title", "description"])
+    .filter();
 
-  const where: any = {
-    isActive: true,
-  };
+  const { skip, take } = queryBuilder.paginate();
+  const page = Number(query.page) || 1;
+  const limit = take;
 
-  if (city) where.city = city;
-  if (category) where.category = category;
-
-  if (searchTerm) {
-    where.OR = [
-      {
-        title: {
-          contains: searchTerm,
-          mode: "insensitive",
-        },
-      },
-      {
-        description: {
-          contains: searchTerm,
-          mode: "insensitive",
-        },
-      },
-    ];
-  }
-
-  if (minPrice || maxPrice) {
-    where.price = {};
-    if (minPrice) where.price.gte = Number(minPrice);
-    if (maxPrice) where.price.lte = Number(maxPrice);
-  }
+  const where = (queryBuilder as any).where;
 
   const result = await prisma.listing.findMany({
     where,
-
-    skip: (Number(page) - 1) * Number(limit),
-
-    take: Number(limit),
-
-    orderBy: {
-      [sortBy]: sortOrder,
-    },
-
+    skip,
+    take: limit,
+    orderBy: queryBuilder.sort(),
     include: {
       guide: {
         select: {
@@ -78,18 +41,19 @@ const getListing = async (query: Record<string, any>) => {
     },
   });
 
-  const total = await prisma.listing.count({ where });
+  const total = await prisma.listing.count({
+    where,
+  });
 
   return {
     meta: {
-      page: Number(page),
-      limit: Number(limit),
+      page,
+      limit,
       total,
     },
     result,
   };
 };
-
 
 const getListingById = async (id: string) => {
   return prisma.listing.findUnique({

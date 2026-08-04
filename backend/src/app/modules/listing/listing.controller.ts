@@ -31,7 +31,7 @@ const imageUrls = files.map(file => file.path);
 
 const getListing = catchAsync(async (req: Request, res: Response) => {
   const result = await ListingService.getListing(
-    req.query
+req.query
   ); 
 
 
