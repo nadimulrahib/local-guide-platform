@@ -24,4 +24,29 @@ router.get(
   ListingController.getListing
 );
 
+router.get(
+  "/:id",
+  ListingController.getListingById
+);
+
+router.get(
+  "/my-listings",
+  auth("GUIDE"),
+  ListingController.getMyListings
+);
+
+router.patch(
+  "/:id",
+  auth("GUIDE"),
+  upload.array("images", 5),
+  parseFormData,
+  ListingController.updateListing
+);
+
+router.delete(
+  "/:id",
+  auth("GUIDE"),
+  ListingController.deleteListing
+);
+
 export const ListingRoutes = router;
