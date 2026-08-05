@@ -65,6 +65,7 @@ const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
     bookingId,
     req.user.userId,
     req.body.status
+    
   );
 
   sendResponse(res, {
