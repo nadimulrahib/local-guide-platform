@@ -65,7 +65,7 @@ const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
     bookingId,
     req.user.userId,
     req.body.status
-    
+
   );
 
   sendResponse(res, {
@@ -81,6 +81,7 @@ const cancelBooking = catchAsync(async (req: Request, res: Response) => {
   const bookingId = Array.isArray(id) ? id[0] : id;
 
   const result = await BookingService.cancelBooking(bookingId);
+  
 
   sendResponse(res, {
     success: true,
